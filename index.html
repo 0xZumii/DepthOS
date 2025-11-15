@@ -32,7 +32,6 @@
             justify-content: center;
         }
 
-        /* Ambient background effects */
         #ambient-container {
             position: fixed;
             top: 0;
@@ -87,7 +86,6 @@
             75% { transform: translate(10px, -10px) scale(1.02); }
         }
 
-        /* Monitor container */
         #monitor {
             position: relative;
             width: 1100px;
@@ -116,7 +114,6 @@
             box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.8);
         }
 
-        /* Screen */
         #screen_container {
             width: 100%;
             height: 600px;
@@ -134,7 +131,6 @@
             image-rendering: crisp-edges;
         }
 
-        /* Scanline effect */
         .scanlines {
             position: absolute;
             top: 0;
@@ -150,7 +146,6 @@
             z-index: 100;
         }
 
-        /* Boot overlay */
         #boot-overlay {
             position: absolute;
             top: 0;
@@ -194,7 +189,6 @@
             text-shadow: 0 0 20px rgba(107, 70, 193, 0.5);
         }
 
-        /* Monitor stand */
         #monitor-stand {
             width: 200px;
             height: 80px;
@@ -217,7 +211,6 @@
             opacity: 0.6;
         }
 
-        /* Loading state */
         #loading-info {
             position: absolute;
             bottom: 20px;
@@ -228,7 +221,6 @@
             z-index: 300;
         }
 
-        /* Power button */
         #power-btn {
             position: absolute;
             bottom: 30px;
@@ -266,7 +258,6 @@
             text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
         }
 
-        /* Status LEDs */
         .status-leds {
             position: absolute;
             bottom: 40px;
@@ -303,7 +294,6 @@
             50% { opacity: 0.3; }
         }
 
-        /* Footer info */
         #footer-info {
             margin-top: 30px;
             text-align: center;
@@ -321,7 +311,6 @@
             text-decoration: underline;
         }
 
-        /* Responsive */
         @media (max-width: 1200px) {
             #monitor {
                 padding: 30px 30px 80px 30px;
@@ -391,137 +380,68 @@
         </p>
     </div>
 
-    <!-- v86 Emulator - Load from CDN with correct path -->
-    <script src="https://cdn.jsdelivr.net/npm/v86@0.0.1/build/libv86.js" crossorigin="anonymous"></script>
+    <!-- v86 Emulator -->
+    <script src="https://copy.sh/v86/build/libv86.js"></script>
     
     <script>
         "use strict";
 
-        let emulator;
-        const bootOverlay = document.getElementById('boot-overlay');
-        const loadingInfo = document.getElementById('loading-info');
-        const activityLed = document.getElementById('activity-led');
+        window.onload = function() {
+            const bootOverlay = document.getElementById('boot-overlay');
+            const loadingInfo = document.getElementById('loading-info');
+            const activityLed = document.getElementById('activity-led');
 
-        // Check for SharedArrayBuffer support
-        if (typeof SharedArrayBuffer === 'undefined') {
-            console.error('SharedArrayBuffer is not available. This is required for v86.');
-            console.error('Make sure server sends these headers:');
-            console.error('  Cross-Origin-Opener-Policy: same-origin');
-            console.error('  Cross-Origin-Embedder-Policy: require-corp');
-            loadingInfo.textContent = 'ERROR: SharedArrayBuffer not available. Run with: node server.js';
-            loadingInfo.style.color = '#ef4444';
-        }
-
-        // Check if V86Starter loaded
-        if (typeof V86Starter === 'undefined') {
-            console.error('V86Starter not loaded! Check network tab for script loading errors.');
-            loadingInfo.textContent = 'ERROR: v86 library failed to load';
-            loadingInfo.style.color = '#ef4444';
-        }
-
-        window.onload = async function() {
-            // Double-check dependencies
+            // Check dependencies
             if (typeof SharedArrayBuffer === 'undefined') {
-                console.error('Cannot proceed without SharedArrayBuffer');
+                console.error('SharedArrayBuffer not available');
+                loadingInfo.textContent = 'ERROR: SharedArrayBuffer not available';
+                loadingInfo.style.color = '#ef4444';
                 return;
             }
             
             if (typeof V86Starter === 'undefined') {
-                console.error('Cannot proceed without V86Starter');
+                console.error('V86Starter not loaded');
+                loadingInfo.textContent = 'ERROR: v86 library failed to load';
+                loadingInfo.style.color = '#ef4444';
                 return;
             }
 
-            console.log('DepthOS: Initializing v86 emulator...');
+            console.log('DepthOS: All dependencies loaded ✓');
+            console.log('DepthOS: Initializing emulator...');
             
-            try {
-                // Initialize the emulator
-                emulator = new V86Starter({
-                    wasm_path: "https://cdn.jsdelivr.net/npm/v86@0.0.1/build/v86.wasm",
-                    memory_size: 128 * 1024 * 1024,
-                    vga_memory_size: 8 * 1024 * 1024,
-                    
-                    screen_container: document.getElementById("screen_container"),
-                    
-                    bios: {
-                        url: "https://cdn.jsdelivr.net/npm/v86@0.0.1/bios/seabios.bin",
-                    },
-                    vga_bios: {
-                        url: "https://cdn.jsdelivr.net/npm/v86@0.0.1/bios/vgabios.bin",
-                    },
-                    
-                    // Using pre-built Buildroot Linux for MVP
-                    cdrom: {
-                        url: "https://cdn.jsdelivr.net/npm/v86@0.0.1/images/linux4.iso",
-                    },
-                    
-                    autostart: true,
-                });
+            const emulator = new V86Starter({
+                wasm_path: "https://copy.sh/v86/build/v86.wasm",
+                memory_size: 128 * 1024 * 1024,
+                vga_memory_size: 8 * 1024 * 1024,
+                screen_container: document.getElementById("screen_container"),
+                bios: { url: "https://copy.sh/v86/bios/seabios.bin" },
+                vga_bios: { url: "https://copy.sh/v86/bios/vgabios.bin" },
+                cdrom: { url: "https://copy.sh/v86/images/linux4.iso" },
+                autostart: true,
+            });
 
-                console.log('DepthOS: Emulator instance created');
+            console.log('DepthOS: Emulator created, starting downloads...');
 
-                // Track download progress
-                emulator.add_listener("download-progress", function(e) {
-                    const percent = Math.round((e.loaded / e.total) * 100);
-                    const msg = `Loading ${e.file_name}... ${percent}%`;
-                    loadingInfo.textContent = msg;
-                    console.log('DepthOS:', msg);
-                    
-                    // Flash activity LED
-                    activityLed.style.background = '#f59e0b';
-                });
+            emulator.add_listener("download-progress", function(e) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                loadingInfo.textContent = 'Loading ' + e.file_name + '... ' + percent + '%';
+                console.log('DepthOS: ' + e.file_name + ' ' + percent + '%');
+                activityLed.style.background = '#f59e0b';
+            });
 
-                emulator.add_listener("download-error", function(e) {
-                    console.error('DepthOS: Download error', e);
-                    loadingInfo.textContent = 'Download error: ' + e.file_name;
-                    loadingInfo.style.color = '#ef4444';
-                });
+            emulator.add_listener("emulator-loaded", function() {
+                console.log('DepthOS: Emulator loaded, booting...');
+                loadingInfo.textContent = "Booting...";
+                setTimeout(function() {
+                    bootOverlay.classList.add('hidden');
+                    loadingInfo.style.display = 'none';
+                    console.log('DepthOS: Boot complete ✓');
+                }, 5000);
+            });
 
-                // Hide boot overlay when ready
-                emulator.add_listener("emulator-loaded", function() {
-                    console.log('DepthOS: Emulator loaded successfully');
-                    loadingInfo.textContent = "System loaded. Booting...";
-                    
-                    // Wait for boot sequence animation to complete
-                    setTimeout(() => {
-                        console.log('DepthOS: Hiding boot overlay');
-                        bootOverlay.classList.add('hidden');
-                        loadingInfo.style.display = 'none';
-                    }, 5000);
-                });
-
-                emulator.add_listener("emulator-started", function() {
-                    console.log('DepthOS: Emulator started');
-                });
-
-                // Track disk activity
-                emulator.add_listener("ide-read-start", function() {
-                    activityLed.style.background = '#f59e0b';
-                });
-
-                emulator.add_listener("ide-read-end", function() {
-                    setTimeout(() => {
-                        activityLed.style.background = '#333';
-                    }, 100);
-                });
-
-                // Expose for debugging
-                window.emulator = emulator;
-                window.sendKeys = function(text) {
-                    for (let char of text) {
-                        emulator.keyboard_send_text(char);
-                    }
-                };
-
-                console.log('DepthOS: Setup complete, waiting for downloads...');
-                
-            } catch (error) {
-                console.error('DepthOS: Failed to initialize emulator', error);
-                loadingInfo.textContent = 'ERROR: ' + error.message;
-                loadingInfo.style.color = '#ef4444';
-            }
+            window.emulator = emulator;
         };
 
-        // Power button functionality
         document.getElementById('power-btn').addEventListener('click', function() {
             if (confirm('Restart DepthOS?')) {
                 location.reload();
