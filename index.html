@@ -381,9 +381,11 @@
     </div>
 
     <!-- v86 Emulator - LOCAL FILES -->
-<script type="module">
-    import V86Starter from './lib/v86core.js';
-    
+<script src="lib/v86core.js"></script>
+
+<script>
+    "use strict";
+
     window.onload = function() {
         const bootOverlay = document.getElementById('boot-overlay');
         const loadingInfo = document.getElementById('loading-info');
