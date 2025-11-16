@@ -383,6 +383,7 @@
     <!-- v86 Emulator - LOCAL FILES -->
 <script src="lib/libv86.js"></script>cd lib/
 
+
 <script>
     "use strict";
 
@@ -401,7 +402,7 @@
         console.log('DepthOS: All dependencies loaded ✓');
         console.log('DepthOS: Initializing emulator...');
         
-        const emulator = new V86Starter({
+        const emulator = new V86({
             wasm_path: "lib/v86.wasm",
             memory_size: 128 * 1024 * 1024,
             vga_memory_size: 8 * 1024 * 1024,
